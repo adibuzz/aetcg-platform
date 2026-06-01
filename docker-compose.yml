@@ -1,0 +1,39 @@
+version: '3.8'
+
+networks:
+  aetcg_secure_mesh:
+    driver: bridge
+
+services:
+  web_api:
+    build:
+      context: .
+      target: runner
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=queue_broker
+      - REDIS_PORT=6379
+    networks:
+      - aetcg_secure_mesh
+    depends_on:
+      - queue_broker
+
+  queue_broker:
+    image: redis:7.2-alpine
+    # Explicitly omitting public port bindings blocks external network ingestion vectors entirely
+    networks:
+      - aetcg_secure_mesh
+
+  background_worker:
+    build:
+      context: .
+      target: runner
+    command: python worker.py
+    environment:
+      - REDIS_HOST=queue_broker
+      - REDIS_PORT=6379
+    networks:
+      - aetcg_secure_mesh
+    depends_on:
+      - queue_broker
