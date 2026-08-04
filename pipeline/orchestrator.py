@@ -8,7 +8,7 @@ class StateMachineOrchestrator:
         self.scrubber = DataSanitizationPipeline()
         self.triage_agent = TriageAgent()
         self.critic_agent = ComplianceCriticAgent()
-        self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        self.redis_client = redis.Redis(host='queue_broker', port=6379, db=0)
 
     def execute_workflow(self, raw_job_data: dict) -> dict:
         # Step 1: Ingestion & Sanitization
@@ -31,7 +31,7 @@ class StateMachineOrchestrator:
         state["triage_verdict"] = triage_output["verdict"]
 
         # Step 3: Governance Feedback Iteration Check
-        critic_output = self.critic_agent.critique(state["triage_verdict"])
+        critic_output = self.critic_agent.critique(state["triage_verdict"], state["risk_score"])
         state["critic_feedback"] = critic_output["feedback"]
 
         # Step 4: Conditional Routing Gate Based on Risk Thresholds

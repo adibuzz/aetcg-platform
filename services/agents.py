@@ -14,7 +14,7 @@ class TriageAgent:
         )
         self.system_prompt = """
         You are an enterprise IT triage analyzer. 
-        Read the IT ticket and return ONLY a valid JSON object with three keys:
+        Read the IT ticket and return ONLY a valid json object with three keys:
         - "risk_score" (integer 1-10)
         - "category" (string)
         - "verdict" (string explaining your reasoning)
@@ -24,7 +24,7 @@ class TriageAgent:
         try:
             response = self.client.chat.completions.create(
                 model="gpt-5.4-nano", # Update this if your endpoint requires a specific model name
-                response_format={ "type": "json_object" }, 
+                # response_format={ "type": "json_object" }, 
                 messages=[
                     {"role": "system", "content": self.system_prompt},
                     {"role": "user", "content": target_text}
@@ -57,7 +57,7 @@ class ComplianceCriticAgent:
         1. If risk_score >= 7, set audit_passed to false.
         2. If risk_score < 7, evaluate verdict logic. If routine, set audit_passed to true.
         
-        Return ONLY a valid JSON object with exactly two keys:
+        Return ONLY a valid json object with exactly two keys:
         - "audit_passed" (boolean)
         - "feedback" (string)
         """
@@ -70,8 +70,8 @@ class ComplianceCriticAgent:
             })
 
             response = self.client.chat.completions.create(
-                model="your-custom-model-name", # Update to match your endpoint's model
-                response_format={ "type": "json_object" },
+                model="gpt-5.4-nano", # Update to match your endpoint's model
+                # response_format={ "type": "json_object" },
                 messages=[
                     {"role": "system", "content": self.system_prompt},
                     {"role": "user", "content": user_content}
