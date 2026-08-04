@@ -39,10 +39,10 @@ async def ingest_ticket(payload: TicketIngestionSchema):
         
         logger.info(json.dumps({
             "event": "ticket_ingested_and_queued",
-            "job_id": job.get_id(),
+            "job_id": job.id,
             "latency_ms": (time.time() - start_time) * 1000
         }))
-        return {"status": "queued", "job_id": job.get_id(), "message": "Ticket verification initiated."}
+        return {"status": "queued", "job_id": job.id, "message": "Ticket verification initiated."}
         
     except Exception as e:
         logger.error(json.dumps({"event": "ingestion_failure", "error": str(e)}))
