@@ -6,9 +6,9 @@ from config.settings import settings
 logger = logging.getLogger("aetcg_agents")
 
 class TriageAgent:
-    def __init__(self):
+    def __init__(self, client=None):
         # Point the client to your custom endpoint
-        self.client = OpenAI(
+        self.client = client or OpenAI(
             base_url=settings.LLM_ENDPOINT_URL,
             api_key=settings.LLM_ACCESS_TOKEN
         )
@@ -32,7 +32,8 @@ class TriageAgent:
                 timeout=settings.EXTERNAL_API_TIMEOUT_SEC
             )
             raw_result = response.choices[0].message.content
-            return json.loads(raw_result)
+            print(f"Triage Agent Result: {raw_result}")
+            return self.parse_analysis_result(raw_result)
 
         except Exception as e:
             logger.error(f"Live LLM call failed at custom endpoint: {str(e)}. Applying fallback.")
@@ -42,10 +43,14 @@ class TriageAgent:
                 "verdict": "Network routing timeout encountered during live LLM analysis."
             }
 
+    @staticmethod
+    def parse_analysis_result(raw_result: str) -> dict:
+        return json.loads(raw_result)
+
 class ComplianceCriticAgent:
-    def __init__(self):
+    def __init__(self, client=None):
         # Point the client to your custom endpoint
-        self.client = OpenAI(
+        self.client = client or OpenAI(
             base_url=settings.LLM_ENDPOINT_URL,
             api_key=settings.LLM_ACCESS_TOKEN
         )
@@ -79,11 +84,15 @@ class ComplianceCriticAgent:
                 timeout=settings.EXTERNAL_API_TIMEOUT_SEC
             )
             raw_result = response.choices[0].message.content
-            return json.loads(raw_result)
+            return self.parse_critique_result(raw_result)
 
         except Exception as e:
             logger.error(f"Critic Agent custom LLM call failed: {str(e)}. Applying fail-safe fallback.")
             if risk_score >= 7:
                 return {"audit_passed": False, "feedback": "FALLBACK TRIGGERED: High risk score. Human review mandated."}
             return {"audit_passed": True, "feedback": "FALLBACK TRIGGERED: Processing cleared for standard autonomous routing."}
+
+    @staticmethod
+    def parse_critique_result(raw_result: str) -> dict:
+        return json.loads(raw_result)
 
