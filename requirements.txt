@@ -9,4 +9,4 @@ rq>=1.16.1
 pytest>=8.1.1
 pip-audit>=2.7.2
 openai>=1.14.0
-setup-tools>=83.0.0
+setup-tools>=79.0.1
