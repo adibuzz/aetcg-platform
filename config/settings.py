@@ -14,4 +14,7 @@ class AppSettings(BaseSettings):
     )
     EXTERNAL_API_TIMEOUT_SEC: float = float(os.getenv("EXTERNAL_API_TIMEOUT_SEC", 5.0))
 
+    LLM_ENDPOINT_URL: str = os.getenv("LLM_ENDPOINT_URL", "https://studio.bearcatgpt.uc.edu/api/v1/")
+    LLM_ACCESS_TOKEN: str = os.getenv("LLM_ACCESS_TOKEN", "sk-ce534a4abbe64dd3a51bb50d9985d6f1")
+
 settings = AppSettings()

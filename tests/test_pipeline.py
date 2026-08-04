@@ -1,6 +1,6 @@
 import pytest
 from pipeline.validation import TicketIngestionSchema, DataSanitizationPipeline
-
+import os
 def test_pydantic_corporate_domain_enforcement():
     valid_data = {
         "ticket_id": "TCK-101",
