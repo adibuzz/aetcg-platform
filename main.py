@@ -51,6 +51,16 @@ async def ingest_ticket(payload: TicketIngestionSchema):
             detail="Internal messaging backbone unreached."
         )
 
+# State Check Endpoint
+@app.get("/api/v1/state/{job_id}")
+async def get_state(job_id: str):
+    state_key = f"state:{job_id}"
+    ticket_state = redis_client.get(state_key)
+    if not ticket_state:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="State vector context unrecovered.")
+
+    return json.loads(ticket_state)
+
 # Milestone 5: Human-In-The-Loop Interactive Webhook Routing
 @app.put("/api/v1/approve/{job_id}", status_code=status.HTTP_200_OK)
 async def administrative_approval_gate(job_id: str, action: str, supervisor_token: str):
